@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -72,8 +72,13 @@ const Checkout = () => {
     },
   });
 
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      navigate('/cart');
+    }
+  }, [cartItems, navigate]);
+
   if (cartItems.length === 0) {
-    navigate('/cart');
     return null;
   }
 
@@ -92,35 +97,35 @@ const Checkout = () => {
         quantity: item.quantity,
       }));
 
-      // Insert order into Supabase
-      const { data: insertedOrder, error: insertError } = await supabase
-        .from('orders')
-        .insert({
-          customer_name: data.fullName,
-          phone: data.phone,
-          email: data.email || null,
-          address_line1: data.addressLine1,
-          address_line2: data.addressLine2 || null,
-          city: data.city,
-          state: data.state,
-          pincode: data.pincode,
-          order_notes: data.orderNotes || null,
-          items: orderItems,
-          subtotal,
-          shipping_charge: shippingCost,
-          total,
-          payment_method: data.paymentMethod,
-          order_status: data.paymentMethod === 'COD' ? 'Received' : 'Payment Pending',
-        })
-        .select('id')
-        .single();
+      const orderData = {
+        customer_name: data.fullName,
+        phone: data.phone,
+        email: data.email || null,
+        address_line1: data.addressLine1,
+        address_line2: data.addressLine2 || null,
+        city: data.city,
+        state: data.state,
+        pincode: data.pincode,
+        order_notes: data.orderNotes || null,
+        items: orderItems,
+        subtotal,
+        shipping_charge: shippingCost,
+        total,
+        payment_method: data.paymentMethod,
+        order_status: data.paymentMethod === 'COD' ? 'Received' : 'Payment Pending',
+      };
 
-      if (insertError) {
-        console.error('Order insert error:', insertError);
+      // Create order via edge function
+      const { data: orderResponse, error: orderError } = await supabase.functions.invoke('create-order', {
+        body: { orderData },
+      });
+
+      if (orderError || orderResponse?.error) {
+        console.error('Order creation error:', orderError || orderResponse?.error);
         throw new Error('Failed to create order');
       }
 
-      const orderId = insertedOrder.id;
+      const orderId = orderResponse.orderId;
       console.log('Order created in database:', orderId);
 
       if (data.paymentMethod === 'COD') {
@@ -139,7 +144,7 @@ const Checkout = () => {
             body: {
               amount: total,
               currency: 'INR',
-              receipt: `receipt_${orderId}`,
+              receipt: `receipt_${orderId.slice(-8)}`,
               notes: { order_id: orderId },
             },
           });

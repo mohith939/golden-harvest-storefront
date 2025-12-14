@@ -33,7 +33,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        amount: amount * 100, // Convert to paise
+        amount: Math.round(amount * 100), // Convert to paise
         currency: currency || 'INR',
         receipt,
         notes,
@@ -42,8 +42,16 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('Razorpay API error:', errorData);
-      throw new Error('Failed to create order with payment gateway');
+      console.error('Razorpay API error response:', errorData);
+      console.error('Request details:', {
+        amount: Math.round(amount * 100),
+        currency: currency || 'INR',
+        receipt,
+        notes,
+        url: 'https://api.razorpay.com/v1/orders',
+        method: 'POST'
+      });
+      throw new Error(`Failed to create order with payment gateway: ${errorData}`);
     }
 
     const order = await response.json();
