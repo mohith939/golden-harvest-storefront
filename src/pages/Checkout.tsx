@@ -155,18 +155,33 @@ const Checkout = () => {
 
           console.log('Razorpay order created:', razorpayOrder.id);
 
-          // Detect if mobile device
-          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          // Detect device / webview to avoid Razorpay black flash on in-app browsers
+          const ua = navigator.userAgent || '';
+          const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
+          const isWebView =
+            /(wv|webview|; wv\))/i.test(ua) ||
+            (window as any).ReactNativeWebView ||
+            /FBAN|FBAV|Instagram|Line\//i.test(ua);
           
           const callbackUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/razorpay-callback`;
 
-          const mobileUpiOptions = isMobile
+          const mobileUpiIntentOptions = isMobile && !isWebView
             ? {
-                // Force UPI intent only on mobile browsers with server-side callback
+                // Force UPI intent only on real mobile browsers; avoid in webviews
                 method: 'upi',
                 upi: { flow: 'intent' },
                 redirect: true,
                 callback_url: callbackUrl,
+              }
+            : {};
+
+          const webViewSafeOverrides = isMobile && isWebView
+            ? {
+                // Keep Razorpay inside the webview to prevent blank/black flashes
+                redirect: false,
+                method: undefined,
+                callback_url: undefined,
+                upi: { flow: 'collect' },
               }
             : {};
 
@@ -177,8 +192,10 @@ const Checkout = () => {
             name: 'Golden Harvest',
             description: 'Order Payment',
             order_id: razorpayOrder.id,
-            // Desktop keeps the standard popup flow; mobile uses UPI intent + redirect
-            ...(isMobile ? mobileUpiOptions : { redirect: false }),
+            // Desktop keeps the standard popup flow; mobile browser uses UPI intent + redirect
+            ...(isMobile ? { redirect: false } : { redirect: false }),
+            ...mobileUpiIntentOptions,
+            ...webViewSafeOverrides,
             prefill: {
               name: data.fullName,
               email: data.email || '',
