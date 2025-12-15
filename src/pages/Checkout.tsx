@@ -155,19 +155,18 @@ const Checkout = () => {
 
           console.log('Razorpay order created:', razorpayOrder.id);
 
-          // Get the callback URL for server-side handling (required for mobile UPI)
-          const callbackUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/razorpay-callback`;
+          // Detect if mobile device
+          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
           
-          // Open Razorpay checkout with redirect mode for mobile compatibility
-          const options = {
+          // For mobile UPI intent to work, we need redirect: false
+          // The handler will verify payment after user returns from UPI app
+          const options: any = {
             key: razorpayOrder.key_id,
             amount: razorpayOrder.amount,
             currency: razorpayOrder.currency,
             name: 'Golden Harvest',
             description: 'Order Payment',
             order_id: razorpayOrder.id,
-            callback_url: callbackUrl,
-            redirect: true, // Enable redirect for mobile UPI apps
             prefill: {
               name: data.fullName,
               email: data.email || '',
@@ -176,29 +175,118 @@ const Checkout = () => {
             notes: {
               order_id: orderId,
             },
-            modal: {
-              ondismiss: async () => {
-                // Payment cancelled - update order status
+            handler: async (response: any) => {
+              try {
+                console.log('Payment response received:', response);
+                // Verify payment via edge function
+                const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-razorpay-payment', {
+                  body: {
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                    order_id: orderId,
+                  },
+                });
+
+                if (verifyError || verifyData?.status !== 'ok') {
+                  throw new Error('Payment verification failed');
+                }
+
+                clearCart();
+                navigate('/order-confirmation', { state: { orderId } });
+
+                toast({
+                  title: 'Payment successful!',
+                  description: 'Your order has been confirmed and payment received.',
+                });
+              } catch (verifyErr) {
+                console.error('Payment verification error:', verifyErr);
                 await supabase
                   .from('orders')
-                  .update({ order_status: 'Payment Cancelled' })
+                  .update({ order_status: 'Payment Failed' })
                   .eq('id', orderId);
 
                 toast({
-                  title: 'Payment cancelled',
-                  description: 'You can try again or choose COD.',
+                  title: 'Payment verification failed',
+                  description: 'Please contact support if amount was debited.',
                   variant: 'destructive',
                 });
+              }
+            },
+            modal: {
+              ondismiss: async () => {
+                // Check if payment was actually completed (for mobile UPI flow)
+                // Sometimes the handler doesn't fire on mobile, so we poll the order status
+                console.log('Modal dismissed, checking payment status...');
+                
+                // Wait a moment for any pending webhooks
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Check order status from database
+                const { data: orderData } = await supabase
+                  .from('orders')
+                  .select('order_status')
+                  .eq('id', orderId)
+                  .single();
+                
+                if (orderData?.order_status === 'Paid') {
+                  // Payment was successful via webhook
+                  clearCart();
+                  navigate('/order-confirmation', { state: { orderId } });
+                  toast({
+                    title: 'Payment successful!',
+                    description: 'Your order has been confirmed.',
+                  });
+                } else {
+                  // Payment was cancelled or failed
+                  await supabase
+                    .from('orders')
+                    .update({ order_status: 'Payment Cancelled' })
+                    .eq('id', orderId);
+
+                  toast({
+                    title: 'Payment cancelled',
+                    description: 'You can try again or choose COD.',
+                    variant: 'destructive',
+                  });
+                }
               },
               escape: false,
               backdropclose: false,
+              confirm_close: true, // Ask user before closing on mobile
             },
             theme: {
               color: '#059669',
             },
+            // Enable proper UPI intent handling for mobile
+            ...(isMobile && {
+              config: {
+                display: {
+                  preferences: {
+                    show_default_blocks: true,
+                  }
+                }
+              }
+            }),
           };
 
           const rzp = new (window as any).Razorpay(options);
+          
+          // Handle payment failure event
+          rzp.on('payment.failed', async (response: any) => {
+            console.error('Payment failed:', response.error);
+            await supabase
+              .from('orders')
+              .update({ order_status: 'Payment Failed' })
+              .eq('id', orderId);
+
+            toast({
+              title: 'Payment failed',
+              description: response.error?.description || 'Please try again.',
+              variant: 'destructive',
+            });
+          });
+          
           rzp.open();
         } catch (razorpayErr) {
           console.error('Razorpay error:', razorpayErr);
