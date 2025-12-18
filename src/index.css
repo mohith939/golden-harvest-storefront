@@ -80,6 +80,10 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    font-size: 80%;
+  }
+
   body {
     @apply bg-background text-foreground;
   }

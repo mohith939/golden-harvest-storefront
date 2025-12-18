@@ -3,9 +3,9 @@
 const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySRQ1IkYVK8Adf34vDjYOk4_iNstXo7tcrL4kXSKsFLH_tYpWBOTLNpv2OLaNd9iYm/exec';
 
 export interface FormSubmissionData {
-  formType: 'bulk_inquiry' | 'contact' | 'newsletter';
-  name: string;
-  email: string;
+  formType: 'bulk_inquiry' | 'contact' | 'newsletter' | 'order';
+  name?: string;
+  email?: string;
   phone?: string;
   subject?: string;
   message?: string;
@@ -15,6 +15,21 @@ export interface FormSubmissionData {
   quantity?: string;
   frequency?: string;
   notes?: string;
+  // Order fields
+  orderId?: string;
+  customer_name?: string;
+  address_line1?: string;
+  address_line2?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  order_notes?: string;
+  items?: any[];
+  subtotal?: number;
+  shipping_charge?: number;
+  total?: number;
+  payment_method?: string;
+  order_status?: string;
 }
 
 export const submitFormXHR = async (data: FormSubmissionData): Promise<{ success: boolean; error?: string }> => {

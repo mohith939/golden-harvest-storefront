@@ -58,7 +58,7 @@ const Footer = () => {
     <footer className="bg-warm-beige border-t border-border">
       {/* Newsletter Section */}
       <div className="border-b border-border">
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto text-center">
             <h3 className="text-2xl font-serif font-bold text-primary mb-4">
               Stay Connected with Farm Fresh Updates
@@ -86,7 +86,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* About Section */}
           <div className="md:col-span-2">
@@ -152,7 +152,7 @@ const Footer = () => {
               <li><Link to="/privacy" className="text-sm text-foreground/70 hover:text-primary transition-colors">Privacy Policy</Link></li>
               <li><Link to="/terms" className="text-sm text-foreground/70 hover:text-primary transition-colors">Terms of Service</Link></li>
               <li className="text-sm text-foreground/70">FSSAI: 12345678901234</li>
-              <li className="text-sm text-foreground/70">GST: 22AAAAA0000A1Z5</li>
+              <li className="text-sm text-foreground/70">GST: 37CTWPJ4314B1ZN</li>
             </ul>
             <div className="mt-6">
               <h5 className="text-sm font-semibold text-primary mb-3 flex items-center">

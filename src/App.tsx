@@ -16,6 +16,7 @@ import Privacy from './pages/Privacy';
 import Returns from './pages/Returns';
 import Shipping from './pages/Shipping';
 import { CartProvider } from './contexts/CartContext';
+import { Toaster } from '@/components/ui/toaster';
 import { initGA, trackPageView } from './utils/analytics';
 import './index.css';
 
@@ -53,6 +54,7 @@ function App() {
           <Footer />
         </div>
       </Router>
+      <Toaster />
     </CartProvider>
   );
 }

@@ -26,6 +26,7 @@ import {
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { submitFormXHR } from '@/utils/formSubmission';
 
 const indianStates = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -180,6 +181,27 @@ const Checkout = () => {
       const orderId = orderResponse.orderId;
       console.log('Order created in database:', orderId);
 
+      // Send order to Google Sheets (fire and forget - don't block checkout)
+      submitFormXHR({
+        formType: 'order',
+        orderId,
+        customer_name: data.fullName,
+        phone: data.phone,
+        email: data.email || '',
+        address_line1: data.addressLine1,
+        address_line2: data.addressLine2 || '',
+        city: data.city,
+        state: data.state,
+        pincode: data.pincode,
+        order_notes: data.orderNotes || '',
+        items: orderItems,
+        subtotal,
+        shipping_charge: shippingCost,
+        total,
+        payment_method: data.paymentMethod,
+        order_status: data.paymentMethod === 'COD' ? 'Received' : 'Payment Pending',
+      }).catch(err => console.error('Failed to send order to sheets:', err));
+
       if (data.paymentMethod === 'COD') {
         // COD flow - order is already created with 'Received' status
         clearCart();
@@ -248,7 +270,7 @@ const Checkout = () => {
             key: razorpayOrder.key_id,
             amount: razorpayOrder.amount,
             currency: razorpayOrder.currency,
-            name: 'Golden Harvest',
+            name: 'GHRaw Powders',
             description: 'Order Payment',
             order_id: razorpayOrder.id,
             // Defaults: desktop popup

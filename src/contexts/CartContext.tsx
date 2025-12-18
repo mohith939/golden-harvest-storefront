@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, ProductVariant } from '@/data/products';
+import { useToast } from '@/hooks/use-toast';
 
 export interface CartItem {
   product: Product;
@@ -28,6 +29,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { toast } = useToast();
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     const savedCart = localStorage.getItem('goldenHarvestCart');
     return savedCart ? JSON.parse(savedCart) : [];
@@ -62,6 +64,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return [...prevItems, { product, variant, quantity }];
     });
+
+    // Show notification only on desktop (screen width > 768px)
+    if (typeof window !== 'undefined' && window.innerWidth > 768) {
+      toast({
+        title: "Added to Cart",
+        description: `Product "${product.name}" added to cart!`,
+      });
+    }
   };
 
   const removeFromCart = (productId: string, variantWeight: string) => {

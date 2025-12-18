@@ -117,10 +117,10 @@ const Index = () => {
         </div>
         <div className="relative w-full px-4 py-20 md:py-32">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-7xl font-serif font-bold text-primary mb-6 animate-fade-in drop-shadow-sm">
+            <h1 className="text-3xl md:text-5xl font-serif font-bold text-primary mb-6 animate-fade-in drop-shadow-sm">
               Raw. Real. Truly Pure.
             </h1>
-            <p className="text-xl md:text-2xl text-foreground mb-8 animate-fade-in-delay font-serif font-semibold">
+            <p className="text-lg md:text-xl text-foreground mb-8 animate-fade-in-delay font-serif font-semibold">
               Clean, raw, chemical-free powders made from fresh farm produce naturally pure.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-delay-2">
@@ -136,10 +136,10 @@ const Index = () => {
       </section>
 
       {/* Why Golden Harvest */}
-      <section className="py-20 bg-warm-beige animate-fade-in">
+      <section className="py-16 bg-warm-beige animate-fade-in">
         <div className="w-full px-4">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-center text-primary mb-16 drop-shadow-sm animate-slide-up">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-center text-primary mb-12 drop-shadow-sm animate-slide-up">
               Why Golden Harvest?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -162,9 +162,9 @@ const Index = () => {
                 }
               ].map((feature, index) => (
                 <Card key={index} className={`border-muted bg-muted/50 shadow-lg hover:shadow-md hover:scale-105 transition-all duration-300 animate-fade-in-delay-${index + 1}`}>
-                  <CardContent className="p-8 text-center">
-                    <h3 className="text-xl font-semibold text-primary mb-4">{feature.title}</h3>
-                    <p className="text-foreground/70 leading-relaxed">{feature.description}</p>
+                  <CardContent className="p-6 text-center">
+                    <h3 className="text-lg font-semibold text-primary mb-4">{feature.title}</h3>
+                    <p className="text-foreground/70 leading-relaxed text-sm">{feature.description}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -174,7 +174,7 @@ const Index = () => {
       </section>
 
       {/* Featured Products */}
-      <section className="py-24 bg-background">
+      <section className="py-20 bg-background">
         <div className="w-full px-4">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-20">
@@ -296,7 +296,7 @@ const Index = () => {
       </section>
 
       {/* Village Story */}
-      <section className="py-20 bg-warm-beige">
+      <section className="py-12 md:py-20 bg-warm-beige">
         <div className="w-full px-4">
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -310,7 +310,7 @@ const Index = () => {
                 </p>
                 <p className="text-foreground/80 leading-relaxed mb-8 text-lg">
                   Each powder carries the story of dedicated hands that nurture the land, ensuring that when you sprinkle our products into your meals,
-                  you're not just adding nutrition — you're connecting with the timeless rhythm of Indian agriculture.
+                  you're not just adding nutrition. You're connecting with the timeless rhythm of Indian agriculture.
                 </p>
                 <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
                   <Link to="/about">Read Our Full Story</Link>
@@ -334,7 +334,7 @@ const Index = () => {
       </section>
 
       {/* Farmer Testimonials */}
-      <section className="py-20 bg-background overflow-x-hidden">
+      <section className="py-16 bg-background overflow-x-hidden">
         <div className="w-full px-4">
           <div className="max-w-6xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-12 drop-shadow-sm">
@@ -386,7 +386,7 @@ const Index = () => {
       </section>
 
       {/* Instagram Reels */}
-      <section className="py-20 bg-warm-beige">
+      <section className="py-12 bg-warm-beige">
         <div className="w-full px-4">
           <div className="max-w-7xl mx-auto text-center">
             <h2 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-12 drop-shadow-sm">
@@ -420,7 +420,7 @@ const Index = () => {
       </section>
 
       {/* Certifications Scroller */}
-      <section className="py-12 bg-primary overflow-hidden">
+      <section className="py-8 bg-primary overflow-hidden">
         <div className="w-full">
           <div className="animate-scroll flex space-x-48">
             {[

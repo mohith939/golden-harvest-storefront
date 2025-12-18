@@ -51,7 +51,7 @@ serve(async (req) => {
     });
 
     // Get the frontend URL from environment
-    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://goldenharvestrawpowders.com';
+    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://ghrawpowders.com';
 
     // Validate required fields
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -87,7 +87,7 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Callback processing error:', error);
-    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://goldenharvestrawpowders.com';
+    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://ghpowders.com';
     return Response.redirect(`${frontendUrl}/checkout?payment_status=failed&reason=server_error`, 302);
   }
 });
