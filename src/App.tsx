@@ -12,7 +12,7 @@ import About from './pages/About';
 import BulkInquiry from './pages/BulkInquiry';
 import Contact from './pages/Contact';
 import Faq from './pages/Faq';
-import Collaborations from './pages/Collaborations';
+
 import Shipping from './pages/Shipping';
 import Returns from './pages/Returns';
 import Privacy from './pages/Privacy';
