@@ -8,16 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { calculateShippingCharge } from '@/utils/shipping';
-import { Loader2, User, Phone, Mail, MapPin, Shield, Lock, ShoppingCart } from 'lucide-react';
+import { Loader2, User, Phone, Mail, MapPin, ShoppingCart, MessageCircle } from 'lucide-react';
 import CheckoutProgress from '@/components/CheckoutProgress';
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
+const WHATSAPP_NUMBER = '919392633211';
 
 const Checkout = () => {
   const { cartItems, getCartTotal, getCartTotalWeight, clearCart } = useCart();
@@ -36,12 +31,10 @@ const Checkout = () => {
     order_notes: ''
   });
 
-
   const subtotal = getCartTotal();
   const totalWeight = getCartTotalWeight();
   const shippingCost = calculateShippingCharge(totalWeight, formData.state);
-  const taxAmount = Math.round((subtotal + shippingCost) * 0.05);
-  const total = Math.round(subtotal + shippingCost + taxAmount);
+  const total = Math.round(subtotal + shippingCost);
 
   useEffect(() => {
     if (cartItems.length === 0) {
@@ -53,8 +46,6 @@ const Checkout = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-
-
 
   const validateForm = () => {
     const required = ['customer_name', 'phone', 'address_line1', 'city', 'state', 'pincode'];
@@ -87,126 +78,74 @@ const Checkout = () => {
     return true;
   };
 
-  const createOrder = async () => {
-    const orderData = {
-      customer_name: formData.customer_name,
-      phone: formData.phone,
-      email: formData.email || null,
-      address_line1: formData.address_line1,
-      address_line2: formData.address_line2 || null,
-      city: formData.city,
-      state: formData.state,
-      pincode: formData.pincode,
-      order_notes: formData.order_notes || null,
-      items: cartItems.map(item => ({
-        product_id: item.product.id,
-        product_name: item.product.name,
-        variant: item.variant.weight,
-        price: item.variant.price,
-        quantity: item.quantity,
-        image: item.product.imageUrl
-      })),
-      subtotal,
-      shipping_charge: shippingCost,
-      total_weight: totalWeight,
-      total,
-      payment_method: 'Razorpay'
-    };
+  const generateWhatsAppMessage = () => {
+    const itemsList = cartItems.map(item => 
+      `• ${item.product.name} (${item.variant.weight}) x${item.quantity} - ₹${(item.variant.price * item.quantity).toFixed(0)}`
+    ).join('\n');
 
-    const { data, error } = await supabase.functions.invoke('create-order', {
-      body: { orderData }
-    });
+    const message = `🌿 *New Order from Golden Harvest*
 
-    if (error) {
-      throw new Error(error.message);
-    }
+*Customer Details:*
+Name: ${formData.customer_name}
+Phone: ${formData.phone}
+${formData.email ? `Email: ${formData.email}` : ''}
 
-    return data.orderId;
+*Shipping Address:*
+${formData.address_line1}
+${formData.address_line2 ? formData.address_line2 + '\n' : ''}${formData.city}, ${formData.state} - ${formData.pincode}
+
+*Order Items:*
+${itemsList}
+
+*Order Summary:*
+Subtotal: ₹${subtotal.toFixed(0)}
+Shipping: ₹${shippingCost}
+*Total: ₹${total}*
+
+${formData.order_notes ? `*Notes:* ${formData.order_notes}` : ''}
+
+Payment Method: Cash on Delivery`;
+
+    return encodeURIComponent(message);
   };
 
-  const createRazorpayOrder = async (orderId: string) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
-        body: {
-          amount: total,
-          currency: 'INR',
-          receipt: orderId,
-          notes: { orderId }
-        }
-      });
-
-      if (error) {
-        console.error('Razorpay order creation error:', error);
-        throw new Error(error.message || 'Failed to create payment order');
-      }
-
-      if (!data || !data.id) {
-        throw new Error('Invalid response from payment gateway');
-      }
-
-      return data;
-    } catch (error: any) {
-      console.error('Razorpay order creation failed:', error);
-      throw new Error(error.message || 'Failed to initialize payment. Please try again.');
-    }
-  };
-
-  const handlePayment = async () => {
+  const handleWhatsAppOrder = () => {
     if (!validateForm()) return;
 
     setIsLoading(true);
+    
     try {
-      console.log('Starting payment process...');
-      const orderId = await createOrder();
-      console.log('Order created, creating Razorpay order...');
-      const razorpayOrder = await createRazorpayOrder(orderId);
-      console.log('Razorpay order created:', razorpayOrder);
+      const message = generateWhatsAppMessage();
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+      
+      // Open WhatsApp in new tab
+      window.open(whatsappUrl, '_blank');
+      
+      toast({
+        title: "Redirecting to WhatsApp",
+        description: "Complete your order on WhatsApp. Your cart will be cleared after confirmation.",
+      });
 
-      const options = {
-        key: razorpayOrder.key_id,
-        amount: razorpayOrder.amount,
-        currency: razorpayOrder.currency,
-        name: 'Golden Harvest Storefront',
-        description: 'Order Payment',
-        order_id: razorpayOrder.id,
-        handler: function (response: any) {
-          console.log('Payment successful:', response);
-          // Payment successful
-          clearCart();
-          navigate('/order-confirmation', {
-            state: {
-              orderId,
-              paymentId: response.razorpay_payment_id,
-              amount: total
-            }
-          });
-        },
-        modal: {
-          ondismiss: function() {
-            console.log('Payment modal dismissed');
-            setIsLoading(false);
+      // Clear cart and redirect after a short delay
+      setTimeout(() => {
+        clearCart();
+        navigate('/order-confirmation', {
+          state: {
+            orderId: `WA-${Date.now()}`,
+            amount: total,
+            paymentMethod: 'WhatsApp Order'
           }
-        },
-        prefill: {
-          name: formData.customer_name,
-          email: formData.email,
-          contact: formData.phone
-        },
-        theme: {
-          color: '#16a34a'
-        }
-      };
-
-      console.log('Opening Razorpay modal with options:', options);
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+        });
+      }, 2000);
+      
     } catch (error: any) {
-      console.error('Payment process failed:', error);
+      console.error('WhatsApp order failed:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to process payment",
+        description: "Failed to open WhatsApp. Please try again.",
         variant: "destructive"
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -219,33 +158,33 @@ const Checkout = () => {
     <div className="w-full">
       <CheckoutProgress currentStep="checkout" />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl md:text-4xl font-serif font-bold text-primary animate-fade-in">Checkout</h1>
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-primary">Checkout</h1>
           <Link to="/cart">
-            <Button variant="outline" className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
               <ShoppingCart className="h-4 w-4" />
               Back to Cart
             </Button>
           </Link>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-4 sm:gap-8">
           {/* Customer Details Form */}
-          <div className="space-y-6 animate-fade-in-delay">
+          <div className="space-y-4 sm:space-y-6">
             {/* Personal Information */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-xl font-serif flex items-center gap-2">
-                  <User className="h-5 w-5 text-primary" />
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-lg sm:text-xl font-serif flex items-center gap-2">
+                  <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   Personal Information
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="customer_name" className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
+              <CardContent className="space-y-3 sm:space-y-4">
+                <div className="grid grid-cols-1 gap-3 sm:gap-4">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="customer_name" className="text-sm flex items-center gap-1.5">
+                      <User className="h-3.5 w-3.5" />
                       Full Name *
                     </Label>
                     <Input
@@ -255,12 +194,12 @@ const Checkout = () => {
                       onChange={handleInputChange}
                       placeholder="Enter your full name"
                       required
-                      className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                      className="h-10 sm:h-11"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="flex items-center gap-2">
-                      <Phone className="h-4 w-4" />
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="phone" className="text-sm flex items-center gap-1.5">
+                      <Phone className="h-3.5 w-3.5" />
                       Phone Number *
                     </Label>
                     <Input
@@ -270,13 +209,13 @@ const Checkout = () => {
                       onChange={handleInputChange}
                       placeholder="Enter 10-digit phone number"
                       required
-                      className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                      className="h-10 sm:h-11"
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="email" className="text-sm flex items-center gap-1.5">
+                    <Mail className="h-3.5 w-3.5" />
                     Email (Optional)
                   </Label>
                   <Input
@@ -286,7 +225,7 @@ const Checkout = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="Enter your email"
-                    className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                    className="h-10 sm:h-11"
                   />
                 </div>
               </CardContent>
@@ -294,15 +233,15 @@ const Checkout = () => {
 
             {/* Shipping Address */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-xl font-serif flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-primary" />
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-lg sm:text-xl font-serif flex items-center gap-2">
+                  <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   Shipping Address
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="address_line1">Address Line 1 *</Label>
+              <CardContent className="space-y-3 sm:space-y-4">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="address_line1" className="text-sm">Address Line 1 *</Label>
                   <Input
                     id="address_line1"
                     name="address_line1"
@@ -310,23 +249,23 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     placeholder="Street address"
                     required
-                    className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                    className="h-10 sm:h-11"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="address_line2">Address Line 2 (Optional)</Label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="address_line2" className="text-sm">Address Line 2 (Optional)</Label>
                   <Input
                     id="address_line2"
                     name="address_line2"
                     value={formData.address_line2}
                     onChange={handleInputChange}
                     placeholder="Apartment, suite, etc."
-                    className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                    className="h-10 sm:h-11"
                   />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="city">City *</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="city" className="text-sm">City *</Label>
                     <Input
                       id="city"
                       name="city"
@@ -334,14 +273,14 @@ const Checkout = () => {
                       onChange={handleInputChange}
                       placeholder="City"
                       required
-                      className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                      className="h-10 sm:h-11"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="state">State *</Label>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="state" className="text-sm">State *</Label>
                     <Select value={formData.state} onValueChange={(value) => setFormData(prev => ({ ...prev, state: value }))}>
-                      <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-primary/20">
-                        <SelectValue placeholder="Select your state" />
+                      <SelectTrigger className="h-10 sm:h-11">
+                        <SelectValue placeholder="Select state" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Andhra Pradesh">Andhra Pradesh</SelectItem>
@@ -378,13 +317,13 @@ const Checkout = () => {
                         <SelectItem value="Puducherry">Puducherry</SelectItem>
                         <SelectItem value="Chandigarh">Chandigarh</SelectItem>
                         <SelectItem value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</SelectItem>
-                        <SelectItem value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</SelectItem>
+                        <SelectItem value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli</SelectItem>
                         <SelectItem value="Lakshadweep">Lakshadweep</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="pincode">Pincode *</Label>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="pincode" className="text-sm">Pincode *</Label>
                     <Input
                       id="pincode"
                       name="pincode"
@@ -392,20 +331,20 @@ const Checkout = () => {
                       onChange={handleInputChange}
                       placeholder="Pincode"
                       required
-                      className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                      className="h-10 sm:h-11"
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="order_notes">Order Notes (Optional)</Label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="order_notes" className="text-sm">Order Notes (Optional)</Label>
                   <Textarea
                     id="order_notes"
                     name="order_notes"
                     value={formData.order_notes}
                     onChange={handleInputChange}
                     placeholder="Any special instructions..."
-                    rows={3}
-                    className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                    rows={2}
+                    className="resize-none"
                   />
                 </div>
               </CardContent>
@@ -415,82 +354,72 @@ const Checkout = () => {
           {/* Order Summary */}
           <div>
             <Card className="sticky top-20">
-              <CardHeader>
-                <CardTitle className="text-xl font-serif">Order Summary</CardTitle>
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-lg sm:text-xl font-serif">Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-3 max-h-60 overflow-y-auto">
+                <div className="space-y-2 max-h-48 sm:max-h-60 overflow-y-auto">
                   {cartItems.map((item) => (
-                    <div key={`${item.product.id}-${item.variant.weight}`} className="flex gap-3">
+                    <div key={`${item.product.id}-${item.variant.weight}`} className="flex gap-2 sm:gap-3">
                       <img
                         src={item.product.imageUrl}
                         alt={item.product.name}
-                        className="w-12 h-12 object-cover rounded"
+                        className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded"
+                        loading="lazy"
                       />
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm">{item.product.name}</h4>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-xs sm:text-sm truncate">{item.product.name}</h4>
                         <p className="text-xs text-muted-foreground">{item.variant.weight} × {item.quantity}</p>
-                        <p className="text-sm font-medium">₹{(item.variant.price * item.quantity).toFixed(2)}</p>
+                        <p className="text-xs sm:text-sm font-medium">₹{(item.variant.price * item.quantity).toFixed(0)}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-
-
-                <div className="border-t pt-4 space-y-2">
+                <div className="border-t pt-3 sm:pt-4 space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>₹{subtotal.toFixed(2)}</span>
+                    <span>₹{subtotal.toFixed(0)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Shipping</span>
-                    <span>{!formData.state || formData.state.trim() === '' ? '-' : shippingCost === 0 ? 'Free' : `₹${shippingCost}`}</span>
+                    <span>{!formData.state ? 'Select state' : `₹${shippingCost}`}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Tax (5%)</span>
-                    <span>₹{taxAmount.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between font-bold text-lg">
+                  <div className="flex justify-between font-bold text-base sm:text-lg pt-2 border-t">
                     <span>Total</span>
-                    <span>₹{total.toFixed(2)}</span>
+                    <span>₹{total}</span>
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3 pt-2">
                   <Button
                     size="lg"
-                    className="w-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300"
-                    onClick={handlePayment}
-                    disabled={isLoading}
+                    className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white shadow-lg hover:shadow-xl transition-all duration-300 h-12 sm:h-14 text-sm sm:text-base"
+                    onClick={handleWhatsAppOrder}
+                    disabled={isLoading || !formData.state}
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
                         Processing...
                       </>
                     ) : (
                       <>
-                        <Lock className="mr-2 h-4 w-4" />
-                        Pay ₹{total.toFixed(2)} with Razorpay
+                        <MessageCircle className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                        Order via WhatsApp - ₹{total}
                       </>
                     )}
                   </Button>
 
-                  <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Shield className="h-3 w-3" />
-                      <span>SSL Secured</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Lock className="h-3 w-3" />
-                      <span>Secure Payment</span>
-                    </div>
-                  </div>
-
                   <p className="text-xs text-center text-muted-foreground">
-                    Your payment information is encrypted and secure
+                    You'll be redirected to WhatsApp to complete your order
                   </p>
+                  
+                  <div className="bg-primary/5 rounded-lg p-3 text-center">
+                    <p className="text-xs text-muted-foreground">
+                      💵 Cash on Delivery • 🚚 All India Shipping
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>

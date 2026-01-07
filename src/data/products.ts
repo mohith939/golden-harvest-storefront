@@ -182,7 +182,6 @@ export const products: Product[] = [
     imageUrl: moringaPowderImage,
     imageUrls: [moringaPowderImage],
     variants: [
-      { weight: '100g', price: 1, originalPrice: 1, discountPercentage: 0, stock: 500, sku: 'MOR-100' },
       { weight: '150g', price: 229, originalPrice: 270, discountPercentage: 15, stock: 500, sku: 'MOR-150' },
       { weight: '500g', price: 723, originalPrice: 850, discountPercentage: 15, stock: 500, sku: 'MOR-500' }
     ],

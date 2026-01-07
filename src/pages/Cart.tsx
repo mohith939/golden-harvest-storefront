@@ -14,14 +14,12 @@ const Cart = () => {
   const { toast } = useToast();
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(0);
-  const shippingThreshold = 500;
   const subtotal = getCartTotal();
-  const shippingCost = subtotal >= shippingThreshold ? 0 : 50;
-  const total = subtotal + shippingCost - appliedDiscount;
+  const total = subtotal - appliedDiscount;
 
   const applyDiscount = () => {
     if (discountCode.toUpperCase() === 'GH06') {
-      const discountAmount = (subtotal + shippingCost) * 0.10;
+      const discountAmount = subtotal * 0.10;
       setAppliedDiscount(discountAmount);
       toast({
         title: "Discount Applied",
