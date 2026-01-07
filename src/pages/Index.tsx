@@ -10,11 +10,10 @@ import arjunPhoto from '@/assets/arjun_photo.png';
 import fassiCert from '@/assets/Certificates/fassi.avif';
 import gmpCert from '@/assets/Certificates/gmp.avif';
 import isoCert from '@/assets/Certificates/iso.avif';
-import flakesImage from '@/assets/coconut-powder.jpg';
-import fruitPowdersImage from '@/assets/amla-powder.jpg';
-import vegetablePowderImage from '@/assets/carrot-powder.jpg';
-import leafyVegetablePowderImage from '@/assets/spinach-powder.jpg';
-import flowerPowdersImage from '@/assets/turmeric-powder.jpg';
+import flakesImage from '@/assets/Coconut.png';
+import fruitPowdersImage from '@/assets/Amla.png';
+import vegetablePowderImage from '@/assets/Carrot.png';
+import leafyVegetablePowderImage from '@/assets/Palak.png';
 import Autoplay from 'embla-carousel-autoplay';
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -150,12 +149,41 @@ const Index = () => {
       "availability": "https://schema.org/InStock",
       "shippingDetails": {
         "@type": "OfferShippingDetails",
+        "shippingRate": {
+          "@type": "MonetaryAmount",
+          "value": "0",
+          "currency": "INR"
+        },
         "shippingDestination": {
           "@type": "DefinedRegion",
           "addressCountry": "IN"
+        },
+        "deliveryTime": {
+          "@type": "ShippingDeliveryTime",
+          "handlingTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 1,
+            "maxValue": 2,
+            "unitText": "Day",
+            "unitCode": "DAY"
+          },
+          "transitTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 2,
+            "maxValue": 5,
+            "unitText": "Day",
+            "unitCode": "DAY"
+          }
         }
       },
-      "hasMerchantReturnPolicy": true
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "applicableCountry": "IN",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+        "merchantReturnDays": 7,
+        "returnMethod": "https://schema.org/ReturnByMail",
+        "returnFees": "https://schema.org/FreeReturn"
+      }
     },
     "brand": {
       "@type": "Brand",
@@ -322,6 +350,7 @@ const Index = () => {
                           src={product.imageUrl}
                           alt={product.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          loading="lazy"
                         />
                       </div>
                       <h3 className="text-xl font-semibold text-primary mb-4">{product.name}</h3>
@@ -582,7 +611,7 @@ const Index = () => {
               Ready to Experience Pure Nutrition?
             </h2>
             <p className="text-xl mb-8 opacity-90">
-              Order now with Cash on Delivery. Free shipping across India on orders above ₹500.
+              Order now.
             </p>
             <Button asChild size="lg" variant="secondary" className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Link to="/shop">Start Shopping</Link>
@@ -590,6 +619,7 @@ const Index = () => {
           </div>
         </div>
       </section>
+
     </div>
     </>
   );

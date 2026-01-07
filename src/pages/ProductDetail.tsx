@@ -2,13 +2,13 @@ import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
 import WheelGestures from 'embla-carousel-wheel-gestures';
 import { products, type ProductVariant } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
-import { CheckCircle, Star, Truck, Shield, Award, Minus, Plus } from 'lucide-react';
+import { CheckCircle, Truck, Shield, Award, Minus, Plus } from 'lucide-react';
 import { trackProductView, trackAddToCart } from '@/utils/analytics';
+
 import { Helmet } from 'react-helmet-async';
 
 const ProductDetail = () => {
@@ -24,6 +24,7 @@ const ProductDetail = () => {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(product.variants[0]);
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+  const [showAddedMessage, setShowAddedMessage] = useState(false);
 
   const currentPrice = selectedVariant.price;
 
@@ -49,6 +50,8 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     addToCart(product, selectedVariant, quantity);
+    setShowAddedMessage(true);
+    setTimeout(() => setShowAddedMessage(false), 3000); // Hide after 3 seconds
     // Track add to cart event
     trackAddToCart({
       id: product.id,
@@ -82,38 +85,38 @@ const ProductDetail = () => {
         "shippingDestination": {
           "@type": "DefinedRegion",
           "addressCountry": "IN"
+        },
+        "deliveryTime": {
+          "@type": "ShippingDeliveryTime",
+          "handlingTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 1,
+            "maxValue": 2,
+            "unitText": "Day",
+            "unitCode": "DAY"
+          },
+          "transitTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 2,
+            "maxValue": 5,
+            "unitText": "Day",
+            "unitCode": "DAY"
+          }
         }
       },
-      "hasMerchantReturnPolicy": true
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "applicableCountry": "IN",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+        "merchantReturnDays": 7,
+        "returnMethod": "https://schema.org/ReturnByMail",
+        "returnFees": "https://schema.org/FreeReturn"
+      }
     },
     "brand": {
       "@type": "Brand",
       "name": "Golden Harvest"
-    },
-    ...(product.averageRating && {
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": product.averageRating,
-        "reviewCount": product.reviews?.length || 0,
-        "bestRating": 5,
-        "worstRating": 1
-      }
-    }),
-    ...(product.reviews && product.reviews.length > 0 && {
-      "review": product.reviews.map(review => ({
-        "@type": "Review",
-        "author": {
-          "@type": "Person",
-          "name": review.author
-        },
-        "reviewRating": {
-          "@type": "Rating",
-          "ratingValue": review.rating,
-          "bestRating": 5
-        },
-        "reviewBody": review.comment
-      }))
-    })
+    }
   };
 
   return (
@@ -177,12 +180,7 @@ const ProductDetail = () => {
                     </Badge>
                   </div>
                 </div>
-                {product.averageRating && (
-                  <div className="flex items-center gap-2">
-                    <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
-                    <span className="font-semibold text-lg">{product.averageRating}</span>
-                  </div>
-                )}
+
               </div>
               <div className="flex flex-wrap gap-3 mb-6">
                 {product.category.map((cat, idx) => (
@@ -249,6 +247,12 @@ const ProductDetail = () => {
                   </div>
                 </div>
               </div>
+
+              {showAddedMessage && (
+                <div className="text-center py-2 px-4 bg-green-100 text-green-800 rounded-lg font-semibold animate-fade-in">
+                  Product added to cart
+                </div>
+              )}
 
               <Button onClick={handleAddToCart} size="lg" className="w-full py-8 text-xl font-semibold shadow-lg hover:shadow-xl transition-shadow">
                 Add to Cart - ₹{currentPrice * quantity}
@@ -368,6 +372,8 @@ const ProductDetail = () => {
               ))}
             </div>
           </section>
+
+
 
           {/* Bulk Orders */}
           <section className="bg-primary text-primary-foreground rounded-2xl p-8 md:p-12">

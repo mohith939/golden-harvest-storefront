@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { submitFormXHR } from '@/utils/formSubmission';
-import companyLogo from '@/assets/company_logo.png';
+import companyLogo from '/company_logo.png';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
@@ -55,7 +55,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-warm-beige border-t border-border">
+    <footer className="text-white border-t border-white/20">
       {/* Newsletter Section */}
       <div className="border-b border-border">
         <div className="container mx-auto px-4 py-8">
@@ -75,7 +75,7 @@ const Footer = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              <Button type="submit" className="bg-primary hover:bg-primary/90" disabled={isSubmitting}>
+              <Button type="submit" className="bg-primary hover:bg-primary/90 hover:scale-105 transition-all duration-300" disabled={isSubmitting}>
                 {isSubmitting ? "Subscribing..." : "Subscribe"}
               </Button>
             </form>

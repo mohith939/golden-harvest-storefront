@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { products } from '@/data/products';
-import companyLogo from '@/assets/company_logo.png';
+import companyLogo from '/company_logo.png';
 
 const Header = () => {
   const { getCartCount } = useCart();
@@ -46,7 +46,7 @@ const Header = () => {
               <Link
                 key={link.to}
                 to={link.to}
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-all duration-300 hover:scale-105 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
+                className="text-base font-medium text-foreground/80 hover:text-primary transition-all duration-300 hover:scale-105 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
               >
                 {link.label}
               </Link>
@@ -56,7 +56,7 @@ const Header = () => {
           <div className="flex items-center space-x-6">
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative hover:bg-primary/10 transition-colors">
-                <ShoppingCart className="h-5 w-5" />
+                <ShoppingCart className="h-6 w-6" />
                 {getCartCount() > 0 && (
                   <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center font-medium animate-pulse">
                     {getCartCount()}

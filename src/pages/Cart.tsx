@@ -65,19 +65,21 @@ const Cart = () => {
               <Card key={`${item.product.id}-${item.variant.weight}`} className="border-0 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 shadow-lg">
                 <CardContent className="p-8">
                   <div className="flex gap-6">
-                    <div className="w-28 h-28 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
-                      <img
-                        src={item.product.imageUrl}
-                        alt={item.product.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+                    <Link to={`/product/${item.product.id}`} className="flex gap-6 flex-1">
+                      <div className="w-28 h-28 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
+                        <img
+                          src={item.product.imageUrl}
+                          alt={item.product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
 
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-primary mb-2">{item.product.name}</h3>
-                      <p className="text-sm text-foreground/70 mb-3 bg-primary/10 px-3 py-1 rounded-full inline-block">{item.variant.weight}</p>
-                      <p className="text-xl font-bold text-primary">₹{item.variant.price}</p>
-                    </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-primary mb-2">{item.product.name}</h3>
+                        <p className="text-sm text-foreground/70 mb-3 bg-primary/10 px-3 py-1 rounded-full inline-block">{item.variant.weight}</p>
+                        <p className="text-xl font-bold text-primary">₹{item.variant.price}</p>
+                      </div>
+                    </Link>
 
                     <div className="flex flex-col items-end justify-between">
                       <Button

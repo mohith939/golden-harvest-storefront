@@ -2,8 +2,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Users, Award, Leaf, Heart, Truck } from 'lucide-react';
-import heroImage from '@/assets/hero-bg.jpg';
-import arjunPhoto from '@/assets/arjun_photo.png';
+import heroImage from '../assets/Home Page Background.png';
+import arjunPhoto from '../assets/arjun_photo.png';
 
 const About = () => {
   return (
