@@ -179,13 +179,28 @@ const Footer = () => {
         </div>
 
         <div className="mt-8 pt-8 border-t border-border">
-          <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3">
             <p className="text-center md:text-left text-sm text-foreground/60">
-              © {new Date().getFullYear()} Golden Harvest Raw Powders. All rights reserved.
+              © Developed by{' '}
+              <a 
+                href="https://www.finstics.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary hover:underline font-medium"
+              >
+                Finstics
+              </a>
+              . All rights are reserved.
             </p>
-            <div className="flex items-center space-x-4 mt-4 md:mt-0">
-              <span className="text-sm text-foreground/60">Made with ❤️ in India</span>
-            </div>
+            <p className="text-center md:text-right text-sm text-foreground/60">
+              For Website related works do contact{' '}
+              <a 
+                href="tel:+918340956569" 
+                className="text-primary hover:underline font-medium"
+              >
+                +91 8340956569
+              </a>
+            </p>
           </div>
         </div>
       </div>

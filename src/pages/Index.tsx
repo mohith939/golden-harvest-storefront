@@ -349,8 +349,9 @@ const Index = () => {
                         <img
                           src={product.imageUrl}
                           alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform will-change-transform"
                           loading="lazy"
+                          decoding="async"
                         />
                       </div>
                       <h3 className="text-xl font-semibold text-primary mb-4">{product.name}</h3>
