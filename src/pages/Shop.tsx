@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { products } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
 import { Minus, Plus } from 'lucide-react';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const Shop = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -163,15 +164,12 @@ const Shop = () => {
               <Link key={product.id} to={`/product/${product.id}`}>
                 <Card className="h-full hover:shadow-md hover:scale-105 transition-all duration-300 border-muted bg-muted/50 group">
                   <CardContent className="p-6">
-                    <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center overflow-hidden">
-                      <img 
-                        src={product.imageUrl} 
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform will-change-transform"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
+                    <OptimizedImage
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform will-change-transform"
+                      containerClassName="aspect-square rounded-lg mb-4"
+                    />
                     <h3 className="text-lg font-semibold text-primary mb-2">{product.name}</h3>
                     <p className="text-sm text-foreground/70 mb-4 line-clamp-2">{product.shortDescription}</p>
                     <div className="flex items-center justify-between mb-3">

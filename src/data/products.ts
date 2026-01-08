@@ -4,18 +4,18 @@ import moringaPowderImage from '@/assets/Moringa.png';
 import gingerPowderImage from '@/assets/Ginger.png';
 import garlicPowderImage from '@/assets/Garlic.png';
 import carrotPowderImage from '@/assets/Carrot.png';
-import curryLeafPowderImage from '@/assets/Curry Leaves.png';
-import betelLeafPowderImage from '@/assets/betel Leaf.png';
+import curryLeafPowderImage from '@/assets/curry-leaves.png';
+import betelLeafPowderImage from '@/assets/betel-leaf.png';
 import coconutPowderImage from '@/assets/Coconut.png';
 import datesPowderImage from '@/assets/Dates.png';
 import lemonPowderImage from '@/assets/Lemon.png';
-import papayaPowderImage from '@/assets/Papaya Leaves.png';
+import papayaPowderImage from '@/assets/papaya-leaves.png';
 import tomatoPowderImage from '@/assets/Tomato.png';
 import neemPowderImage from '@/assets/Neem.png';
 import spinachPowderImage from '@/assets/Palak.png';
 import amlaPowderImage from '@/assets/Amla.png';
-import bitterGuardPowderImage from '@/assets/Bitter Guard.png';
-import sweetPotatoPowderImage from '@/assets/Sweet Potato.png';
+import bitterGuardPowderImage from '@/assets/bitter-guard.png';
+import sweetPotatoPowderImage from '@/assets/sweet-potato.png';
 
 export interface ProductVariant {
   weight: '100g' | '150g' | '500g';

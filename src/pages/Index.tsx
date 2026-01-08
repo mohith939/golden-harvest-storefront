@@ -17,6 +17,7 @@ import leafyVegetablePowderImage from '@/assets/Palak.png';
 import Autoplay from 'embla-carousel-autoplay';
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const instagramReels = [
   {
@@ -345,15 +346,12 @@ const Index = () => {
                 <Link key={product.id} to={`/product/${product.id}`}>
                   <Card className="h-full hover:shadow-xl transition-all duration-300 border-border bg-card group hover:-translate-y-2">
                     <CardContent className="p-10">
-                      <div className="aspect-square bg-muted rounded-lg mb-8 flex items-center justify-center overflow-hidden">
-                        <img
-                          src={product.imageUrl}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform will-change-transform"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </div>
+                      <OptimizedImage
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform will-change-transform"
+                        containerClassName="aspect-square rounded-lg mb-8"
+                      />
                       <h3 className="text-xl font-semibold text-primary mb-4">{product.name}</h3>
                       <p className="text-foreground/70 mb-8 line-clamp-2 leading-relaxed text-base">{product.shortDescription}</p>
                       <div className="flex items-center justify-between">
