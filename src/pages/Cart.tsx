@@ -1,40 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useCart } from '@/contexts/CartContext';
-import { useToast } from '@/hooks/use-toast';
-import { Minus, Plus, Trash2, ShoppingBag, Tag } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, getCartTotal } = useCart();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [discountCode, setDiscountCode] = useState('');
-  const [appliedDiscount, setAppliedDiscount] = useState(0);
   const subtotal = getCartTotal();
-  const total = subtotal - appliedDiscount;
-
-  const applyDiscount = () => {
-    if (discountCode.toUpperCase() === 'GH06') {
-      const discountAmount = subtotal * 0.10;
-      setAppliedDiscount(discountAmount);
-      toast({
-        title: "Discount Applied",
-        description: "10% discount has been applied to your order!",
-        variant: "default"
-      });
-    } else {
-      toast({
-        title: "Invalid Code",
-        description: "Please enter a valid discount code.",
-        variant: "destructive"
-      });
-      setAppliedDiscount(0);
-    }
-  };
+  const total = subtotal;
 
   if (cartItems.length === 0) {
     return (
@@ -122,31 +96,6 @@ const Cart = () => {
             <Card className="border-border sticky top-20">
               <CardContent className="p-6">
                 <h2 className="text-xl font-serif font-bold text-primary mb-6">Order Summary</h2>
-                
-                {/* Discount Code */}
-                <div className="space-y-2 mb-4">
-                  <Label htmlFor="discount_code" className="flex items-center gap-2">
-                    <Tag className="h-4 w-4" />
-                    Discount Code
-                  </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="discount_code"
-                      value={discountCode}
-                      onChange={(e) => setDiscountCode(e.target.value)}
-                      placeholder="Enter discount code"
-                      className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={applyDiscount}
-                      disabled={!discountCode.trim()}
-                      className="px-4"
-                    >
-                      Apply
-                    </Button>
-                  </div>
-                </div>
 
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-foreground/80">
@@ -157,12 +106,6 @@ const Cart = () => {
                     <span>Shipping</span>
                     <span>Shipping charges will calculate at checkout</span>
                   </div>
-                  {appliedDiscount > 0 && (
-                    <div className="flex justify-between text-green-600">
-                      <span>Discount</span>
-                      <span>-₹{appliedDiscount.toFixed(2)}</span>
-                    </div>
-                  )}
                   <div className="border-t border-border pt-3">
                     <div className="flex justify-between text-lg font-bold text-primary">
                       <span>Total</span>

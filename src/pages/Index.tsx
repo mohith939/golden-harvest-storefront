@@ -24,7 +24,7 @@ const instagramReels = [
     permalink: 'https://www.instagram.com/reel/DIlgU4losxD/',
   },
   {
-    permalink: 'https://www.instagram.com/reel/DKB7rLUROSu/',
+    permalink: 'https://www.instagram.com/reel/DS-F4p0kT83/',
   },
   {
     permalink: 'https://www.instagram.com/reel/DIYJeJltW36',
