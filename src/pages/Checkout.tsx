@@ -104,7 +104,7 @@ Shipping: ₹${shippingCost}
 
 ${formData.order_notes ? `*Notes:* ${formData.order_notes}` : ''}
 
-Payment Method: Cash on Delivery`;
+Payment Method: UPI`;
 
     return encodeURIComponent(message);
   };
@@ -419,7 +419,7 @@ Payment Method: Cash on Delivery`;
                   
                   <div className="bg-primary/5 rounded-lg p-3 text-center">
                     <p className="text-xs text-muted-foreground">
-                      💵 Cash on Delivery • 🚚 All India Shipping
+                      💳 UPI Payment • 🚚 All India Shipping
                     </p>
                   </div>
                 </div>
