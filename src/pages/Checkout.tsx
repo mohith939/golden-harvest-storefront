@@ -12,7 +12,7 @@ import { calculateShippingCharge } from '@/utils/shipping';
 import { Loader2, User, Phone, Mail, MapPin, ShoppingCart } from 'lucide-react';
 import CheckoutProgress from '@/components/CheckoutProgress';
 
-const WHATSAPP_NUMBER = '919392633211';
+const WHATSAPP_NUMBER = '918523059098';
 
 const Checkout = () => {
   const { cartItems, getCartTotal, getCartTotalWeight, clearCart } = useCart();
