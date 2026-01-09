@@ -81,7 +81,7 @@ All colors MUST be HSL.
   }
 
   html {
-    font-size: 80%;
+    font-size: clamp(87.5%, 0.8rem + 0.25vw, 100%);
   }
 
   body {
