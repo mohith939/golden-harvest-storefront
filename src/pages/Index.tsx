@@ -219,7 +219,7 @@ const Index = () => {
       <Helmet>
         {/* Basic Meta Tags */}
         <title>Golden Harvest Raw Powders - Pure Natural Fruit & Vegetable Powders Direct from Farmers</title>
-        <meta name="description" content="Golden Harvest raw powders - Pure, chemical-free fruit and vegetable powders sourced directly from Indian farmers. Lab-tested purity, free shipping above ₹500. Cash on Delivery available." />
+        <meta name="description" content="Golden Harvest raw powders - Pure, chemical-free fruit and vegetable powders sourced directly from Indian farmers. Lab-tested purity, free shipping above ₹500. UPI payment available." />
         <meta name="keywords" content="golden harvest, golden harvest raw powders, ghrawpowders, natural powders, fruit powders, vegetable powders, organic powders, raw powders, chemical-free, farmers direct, Indian spices, health supplements, pure nutrition" />
         <meta name="author" content="Golden Harvest" />
         <meta name="robots" content="index, follow" />

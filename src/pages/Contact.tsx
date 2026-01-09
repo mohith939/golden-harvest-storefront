@@ -287,7 +287,7 @@ const Contact = () => {
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                      <span className="text-foreground/80 text-sm">Cash on Delivery available</span>
+                      <span className="text-foreground/80 text-sm">UPI Payment available</span>
                     </div>
                   </CardContent>
                 </Card>
