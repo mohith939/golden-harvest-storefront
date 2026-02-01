@@ -35,10 +35,10 @@ const Cart = () => {
           <div className="lg:col-span-2 space-y-6 animate-fade-in-delay">
             {cartItems.map((item) => (
               <Card key={`${item.product.id}-${item.variant.weight}`} className="border-0 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 shadow-lg">
-                <CardContent className="p-8">
-                  <div className="flex gap-6">
-                    <Link to={`/product/${item.product.id}`} className="flex gap-6 flex-1">
-                      <div className="w-28 h-28 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
+                <CardContent className="p-4 sm:p-6 lg:p-8">
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                    <Link to={`/product/${item.product.id}`} className="flex gap-4 sm:gap-6 flex-1 min-w-0">
+                      <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
                         <img
                           src={item.product.imageUrl}
                           alt={item.product.name}
@@ -46,14 +46,14 @@ const Cart = () => {
                         />
                       </div>
 
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-primary mb-2">{item.product.name}</h3>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-bold text-primary mb-2 break-words">{item.product.name}</h3>
                         <p className="text-sm text-foreground/70 mb-3 bg-primary/10 px-3 py-1 rounded-full inline-block">{item.variant.weight}</p>
                         <p className="text-xl font-bold text-primary">₹{item.variant.price}</p>
                       </div>
                     </Link>
 
-                    <div className="flex flex-col items-end justify-between">
+                    <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between gap-3">
                       <Button
                         variant="ghost"
                         size="icon"
@@ -63,7 +63,7 @@ const Cart = () => {
                         <Trash2 className="h-5 w-5" />
                       </Button>
 
-                      <div className="flex items-center gap-3 bg-white dark:bg-gray-700 rounded-full px-4 py-2 shadow-md">
+                      <div className="flex items-center gap-2 sm:gap-3 bg-white dark:bg-gray-700 rounded-full px-3 sm:px-4 py-2 shadow-md">
                         <Button
                           variant="ghost"
                           size="icon"
@@ -100,16 +100,16 @@ const Cart = () => {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-foreground/80 gap-2">
                     <span className="flex-shrink-0">Subtotal</span>
-                    <span className="text-right">₹{subtotal.toFixed(2)}</span>
+                    <span className="text-right whitespace-nowrap">₹{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:justify-between text-foreground/80 gap-1 sm:gap-2">
                     <span className="flex-shrink-0">Shipping</span>
-                    <span className="text-sm sm:text-base text-right">Shipping charges will calculate at checkout</span>
+                    <span className="text-sm sm:text-base sm:text-right break-words">Shipping charges will calculate at checkout</span>
                   </div>
                   <div className="border-t border-border pt-3">
                     <div className="flex justify-between text-lg font-bold text-primary gap-2">
                       <span>Total</span>
-                      <span className="text-right">₹{total.toFixed(2)}</span>
+                      <span className="text-right whitespace-nowrap">₹{total.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
