@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +19,9 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isOrderComplete, setIsOrderComplete] = useState(false);
+  // Avoid a race where clearing the cart triggers the "empty cart" redirect
+  // before we can route to the confirmation page.
+  const orderCompletedRef = useRef(false);
   const [formData, setFormData] = useState({
     customer_name: '',
     phone: '',
@@ -37,7 +40,7 @@ const Checkout = () => {
   const total = Math.round(subtotal + shippingCost);
 
   useEffect(() => {
-    if (cartItems.length === 0 && !isOrderComplete) {
+    if (cartItems.length === 0 && !isOrderComplete && !orderCompletedRef.current) {
       navigate('/cart');
     }
   }, [cartItems, navigate, isOrderComplete]);
@@ -116,8 +119,8 @@ const Checkout = () => {
       const result = await submitFormXHR(orderData);
       
       if (result.success) {
+        orderCompletedRef.current = true;
         setIsOrderComplete(true);
-        clearCart();
         navigate('/order-confirmation', {
           state: {
             orderId,
@@ -125,6 +128,7 @@ const Checkout = () => {
             paymentMethod: 'UPI'
           }
         });
+        clearCart();
       } else {
         throw new Error(result.error || 'Failed to submit order');
       }
