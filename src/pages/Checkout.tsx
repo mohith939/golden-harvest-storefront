@@ -18,6 +18,7 @@ const Checkout = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [isOrderComplete, setIsOrderComplete] = useState(false);
   const [formData, setFormData] = useState({
     customer_name: '',
     phone: '',
@@ -36,10 +37,10 @@ const Checkout = () => {
   const total = Math.round(subtotal + shippingCost);
 
   useEffect(() => {
-    if (cartItems.length === 0) {
+    if (cartItems.length === 0 && !isOrderComplete) {
       navigate('/cart');
     }
-  }, [cartItems, navigate]);
+  }, [cartItems, navigate, isOrderComplete]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -115,6 +116,7 @@ const Checkout = () => {
       const result = await submitFormXHR(orderData);
       
       if (result.success) {
+        setIsOrderComplete(true);
         clearCart();
         navigate('/order-confirmation', {
           state: {
