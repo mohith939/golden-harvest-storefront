@@ -102,9 +102,9 @@ const Cart = () => {
                     <span className="flex-shrink-0">Subtotal</span>
                     <span className="text-right whitespace-nowrap">₹{subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:justify-between text-foreground/80 gap-1 sm:gap-2">
+                  <div className="flex justify-between text-foreground/80 gap-2">
                     <span className="flex-shrink-0">Shipping</span>
-                    <span className="text-sm sm:text-base sm:text-right break-words">Shipping charges will calculate at checkout</span>
+                    <span className="text-right text-sm">Calculated at checkout</span>
                   </div>
                   <div className="border-t border-border pt-3">
                     <div className="flex justify-between text-lg font-bold text-primary gap-2">
