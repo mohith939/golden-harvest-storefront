@@ -1,13 +1,34 @@
+import { useEffect, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
 
 const OrderConfirmation = () => {
   const location = useLocation();
+  const { clearCart } = useCart();
   
-  // Get orderId from state
-  const orderId = location.state?.orderId;
+  const persistedOrder = useMemo(() => {
+    try {
+      const raw = sessionStorage.getItem('gh_last_order');
+      return raw ? (JSON.parse(raw) as { orderId?: string; amount?: number; paymentMethod?: string }) : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // Get orderId from state (preferred), fallback to sessionStorage (handles refresh)
+  const orderId = location.state?.orderId ?? persistedOrder?.orderId;
+
+  useEffect(() => {
+    const shouldClear = sessionStorage.getItem('gh_pending_clear_cart') === '1';
+    if (!shouldClear) return;
+
+    clearCart();
+    sessionStorage.removeItem('gh_pending_clear_cart');
+    // Keep last order info for refresh visibility; remove it next time an order happens.
+  }, [clearCart]);
 
   return (
     <div className="w-full py-16">

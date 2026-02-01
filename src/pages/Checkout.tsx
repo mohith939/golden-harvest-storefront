@@ -121,6 +121,18 @@ const Checkout = () => {
       if (result.success) {
         orderCompletedRef.current = true;
         setIsOrderComplete(true);
+        // Persist order details for the confirmation page (survives a refresh)
+        // and delay cart clearing until the confirmation page mounts.
+        sessionStorage.setItem(
+          'gh_last_order',
+          JSON.stringify({
+            orderId,
+            amount: total,
+            paymentMethod: 'UPI',
+            createdAt: Date.now(),
+          })
+        );
+        sessionStorage.setItem('gh_pending_clear_cart', '1');
         navigate('/order-confirmation', {
           state: {
             orderId,
@@ -128,7 +140,6 @@ const Checkout = () => {
             paymentMethod: 'UPI'
           }
         });
-        clearCart();
       } else {
         throw new Error(result.error || 'Failed to submit order');
       }
