@@ -8,6 +8,7 @@ import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
+import OrderConfirmation from './pages/OrderConfirmation';
 import About from './pages/About';
 import BulkInquiry from './pages/BulkInquiry';
 import Contact from './pages/Contact';
@@ -44,6 +45,7 @@ function App() {
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/order-confirmation" element={<OrderConfirmation />} />
               <Route path="/about" element={<About />} />
               <Route path="/bulk-inquiry" element={<BulkInquiry />} />
               <Route path="/contact" element={<Contact />} />
