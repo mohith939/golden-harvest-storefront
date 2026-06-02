@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Users, Award, Leaf, Heart, Truck } from 'lucide-react';
 import heroImage from '../assets/home-page-background.png';
-import arjunPhoto from '../assets/arjun_photo.png';
+import arjunPhoto from '../assets/founder-office.png.asset.json';
 
 const About = () => {
   return (
@@ -41,8 +41,20 @@ const About = () => {
       <section className="py-20 bg-background animate-fade-in">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="animate-slide-in-left">
+            <div className="grid lg:grid-cols-2 gap-12 items-start">
+              <div className="relative animate-slide-in-left order-1 lg:order-1 lg:sticky lg:top-24">
+                <div className="aspect-[3/2] bg-muted rounded-2xl overflow-hidden shadow-2xl">
+                  <img
+                    src={arjunPhoto.url}
+                    alt="Arjun Kumar Bandari, Founder of Golden Harvest"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="absolute -bottom-6 -right-6 bg-card p-4 rounded-lg shadow-lg border hidden sm:block">
+                  <p className="text-sm font-medium text-primary">"Fresh from nature, pure for you"</p>
+                </div>
+              </div>
+              <div className="order-2 lg:order-2 animate-slide-in-right">
                 <h2 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">
                   Our Journey
                 </h2>
@@ -70,18 +82,6 @@ const About = () => {
                 <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
                   <Link to="/shop">Explore Our Range</Link>
                 </Button>
-              </div>
-              <div className="relative animate-slide-in-right">
-                <div className="aspect-[3/4] bg-muted rounded-2xl overflow-hidden shadow-2xl max-w-sm mx-auto">
-                  <img
-                    src={arjunPhoto}
-                    alt="Farmers harvesting fresh produce"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div className="absolute -bottom-6 -left-6 bg-card p-4 rounded-lg shadow-lg border">
-                  <p className="text-sm font-medium text-primary">"Fresh from nature, pure for you"</p>
-                </div>
               </div>
             </div>
           </div>
