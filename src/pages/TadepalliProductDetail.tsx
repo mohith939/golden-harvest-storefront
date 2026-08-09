@@ -4,15 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CheckCircle, Truck, Shield, Award, Minus, Plus, MessageCircle } from 'lucide-react';
+import { CheckCircle, Truck, Shield, Award, Minus, Plus, MessageCircle, ShoppingCart } from 'lucide-react';
 import { getTadepalliProduct } from '@/data/tadepalliProducts';
 import { buildOrderMessage, openWhatsApp } from '@/utils/whatsapp';
+import { useCart } from '@/contexts/CartContext';
+import { useToast } from '@/hooks/use-toast';
+import type { Product, ProductVariant } from '@/data/products';
 
 const TadepalliProductDetail = () => {
   const { id } = useParams();
   const product = getTadepalliProduct(id);
   const [quantity, setQuantity] = useState(1);
   const [customerName, setCustomerName] = useState('');
+  const { addToCart } = useCart();
+  const { toast } = useToast();
 
   if (!product) {
     return (
@@ -26,6 +31,42 @@ const TadepalliProductDetail = () => {
   }
 
   const total = product.price * quantity;
+
+  const handleAddToCart = () => {
+    const variant = {
+      weight: '100g',
+      price: product.price,
+      originalPrice: product.price,
+      discountPercentage: 0,
+      stock: 99,
+      sku: `TDP-${product.id}`,
+    } as ProductVariant;
+
+    const cartProduct = {
+      id: `tadepalli-${product.id}`,
+      name: product.name,
+      shortDescription: `${product.category} — Tadepalli Store`,
+      longDescription: '',
+      benefits: [],
+      usage: '',
+      dosage: '',
+      safety: '',
+      storage: '',
+      category: [product.category],
+      howItMade: '',
+      highlights: [],
+      seoKeywords: { primary: product.name, secondary: [] },
+      imageUrl: '',
+      imageUrls: [],
+      variants: [variant],
+    } as unknown as Product;
+
+    addToCart(cartProduct, variant, quantity);
+    toast({
+      title: 'Added to cart',
+      description: `${quantity} × ${product.name} added to your cart.`,
+    });
+  };
 
   const handleOrder = () => {
     openWhatsApp(
@@ -106,14 +147,25 @@ const TadepalliProductDetail = () => {
                 />
               </div>
 
-              <Button
-                onClick={handleOrder}
-                size="lg"
-                className="w-full py-8 text-xl font-semibold shadow-lg hover:shadow-xl transition-shadow"
-              >
-                <MessageCircle className="mr-2 h-6 w-6" />
-                Order on WhatsApp - ₹{total}
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  onClick={handleAddToCart}
+                  size="lg"
+                  variant="outline"
+                  className="flex-1 py-8 text-lg font-semibold border-2"
+                >
+                  <ShoppingCart className="mr-2 h-5 w-5" />
+                  Add to Cart
+                </Button>
+                <Button
+                  onClick={handleOrder}
+                  size="lg"
+                  className="flex-1 py-8 text-lg font-semibold shadow-lg hover:shadow-xl transition-shadow"
+                >
+                  <MessageCircle className="mr-2 h-5 w-5" />
+                  Buy Now on WhatsApp - ₹{total}
+                </Button>
+              </div>
             </div>
 
             {/* Trust Signals */}
