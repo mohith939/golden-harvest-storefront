@@ -9,9 +9,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { calculateShippingCharge } from '@/utils/shipping';
-import { Loader2, User, Phone, Mail, MapPin, ShoppingCart } from 'lucide-react';
+import { Loader2, User, Phone, Mail, MapPin, ShoppingCart, MessageCircle } from 'lucide-react';
 import CheckoutProgress from '@/components/CheckoutProgress';
-import { submitFormXHR } from '@/utils/formSubmission';
+import { buildOrderMessage, openWhatsApp } from '@/utils/whatsapp';
 
 const Checkout = () => {
   const { cartItems, getCartTotal, getCartTotalWeight, clearCart } = useCart();
@@ -88,61 +88,59 @@ const Checkout = () => {
     
     try {
       const orderId = `GH-${Date.now()}`;
-      
-      // Prepare order data for Google Sheets
-      const orderData = {
-        formType: 'order' as const,
-        orderId,
-        customer_name: formData.customer_name,
-        phone: formData.phone,
-        email: formData.email || '',
-        address_line1: formData.address_line1,
-        address_line2: formData.address_line2 || '',
-        city: formData.city,
-        state: formData.state,
-        pincode: formData.pincode,
-        order_notes: formData.order_notes || '',
-        items: cartItems.map(item => ({
-          product_name: item.product.name,
-          variant: item.variant.weight,
-          quantity: item.quantity,
-          price: item.variant.price * item.quantity
-        })),
-        subtotal: subtotal,
-        shipping_charge: shippingCost,
-        total: total,
-        payment_method: 'UPI',
-        order_status: 'Pending'
-      };
 
-      // Submit to Google Sheets
-      const result = await submitFormXHR(orderData);
-      
-      if (result.success) {
-        orderCompletedRef.current = true;
-        setIsOrderComplete(true);
-        // Persist order details for the confirmation page (survives a refresh)
-        // and delay cart clearing until the confirmation page mounts.
-        sessionStorage.setItem(
-          'gh_last_order',
-          JSON.stringify({
-            orderId,
-            amount: total,
-            paymentMethod: 'UPI',
-            createdAt: Date.now(),
-          })
-        );
-        sessionStorage.setItem('gh_pending_clear_cart', '1');
-        navigate('/order-confirmation', {
-          state: {
-            orderId,
-            amount: total,
-            paymentMethod: 'UPI'
-          }
-        });
-      } else {
-        throw new Error(result.error || 'Failed to submit order');
-      }
+      const address = [
+        formData.address_line1,
+        formData.address_line2,
+        formData.city,
+        formData.state,
+        formData.pincode,
+      ]
+        .filter(Boolean)
+        .join(', ');
+
+      // Send the order straight to WhatsApp (works on mobile app and WhatsApp Web)
+      openWhatsApp(
+        buildOrderMessage({
+          orderId,
+          customerName: formData.customer_name,
+          phone: formData.phone,
+          email: formData.email || undefined,
+          address,
+          notes: formData.order_notes || undefined,
+          items: cartItems.map(item => ({
+            name: item.product.name,
+            variant: item.variant.weight,
+            quantity: item.quantity,
+            price: item.variant.price,
+          })),
+          subtotal,
+          shipping: shippingCost,
+          total,
+        })
+      );
+
+      orderCompletedRef.current = true;
+      setIsOrderComplete(true);
+      // Persist order details for the confirmation page (survives a refresh)
+      // and delay cart clearing until the confirmation page mounts.
+      sessionStorage.setItem(
+        'gh_last_order',
+        JSON.stringify({
+          orderId,
+          amount: total,
+          paymentMethod: 'UPI',
+          createdAt: Date.now(),
+        })
+      );
+      sessionStorage.setItem('gh_pending_clear_cart', '1');
+      navigate('/order-confirmation', {
+        state: {
+          orderId,
+          amount: total,
+          paymentMethod: 'UPI'
+        }
+      });
       
     } catch (error: any) {
       console.error('Order submission failed:', error);
@@ -411,14 +409,14 @@ const Checkout = () => {
                       </>
                     ) : (
                       <>
-                        <ShoppingCart className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                        Place Order - ₹{total}
+                        <MessageCircle className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                        Order on WhatsApp - ₹{total}
                       </>
                     )}
                   </Button>
 
                   <p className="text-xs text-center text-muted-foreground">
-                    Our team will connect with you for payment confirmation
+                    Your order opens in WhatsApp — send the message to confirm
                   </p>
                   
                   <div className="bg-primary/5 rounded-lg p-3 text-center">

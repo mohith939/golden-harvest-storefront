@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ShoppingCart, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
@@ -20,12 +20,16 @@ import companyLogo from '/company_logo.png';
 const Header = () => {
   const { getCartCount } = useCart();
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const isActive = (to: string) =>
+    to === '/' ? location.pathname === '/' : location.pathname.startsWith(to);
 
   const categories = Array.from(new Set(products.flatMap(p => p.category))).sort();
 
   const navLinks = [
     { to: '/', label: 'Home' },
     { to: '/shop', label: 'Shop' },
+    { to: '/tadepalli-store', label: 'Our Tadepalli Store' },
     { to: '/about', label: 'About' },
     { to: '/bulk-inquiry', label: 'Bulk Orders' },
     { to: '/contact', label: 'Contact' },
@@ -41,12 +45,17 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className="text-base font-medium text-foreground/80 hover:text-primary transition-all duration-300 hover:scale-105 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
+                aria-current={isActive(link.to) ? 'page' : undefined}
+                className={`text-sm lg:text-base font-medium transition-all duration-300 hover:scale-105 relative after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full ${
+                  isActive(link.to)
+                    ? 'text-primary font-semibold after:w-full'
+                    : 'text-foreground/80 hover:text-primary after:w-0'
+                }`}
               >
                 {link.label}
               </Link>
@@ -100,7 +109,12 @@ const Header = () => {
                       key={link.to}
                       to={link.to}
                       onClick={() => setIsOpen(false)}
-                      className="text-lg font-medium text-foreground/80 hover:text-primary transition-colors hover:translate-x-2 transform duration-200"
+                      aria-current={isActive(link.to) ? 'page' : undefined}
+                      className={`text-lg font-medium transition-colors hover:translate-x-2 transform duration-200 ${
+                        isActive(link.to)
+                          ? 'text-primary font-semibold border-l-4 border-primary pl-3 -ml-3'
+                          : 'text-foreground/80 hover:text-primary'
+                      }`}
                     >
                       {link.label}
                     </Link>

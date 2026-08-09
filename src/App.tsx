@@ -6,6 +6,8 @@ import ScrollToTop from './components/ScrollToTop';
 import Index from './pages/Index';
 import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
+import TadepalliStore from './pages/TadepalliStore';
+import TadepalliProductDetail from './pages/TadepalliProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
@@ -43,6 +45,8 @@ function App() {
               <Route path="/" element={<Index />} />
               <Route path="/shop" element={<Shop />} />
               <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/tadepalli-store" element={<TadepalliStore />} />
+              <Route path="/tadepalli-store/:id" element={<TadepalliProductDetail />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-confirmation" element={<OrderConfirmation />} />
